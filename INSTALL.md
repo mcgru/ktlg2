@@ -25,7 +25,14 @@ cd ktlg2
 shards install
 
 # Release-сборка
+mkdir -p bin
 crystal build src/main.cr --release -o bin/ktlg2
+
+# Создание deb-файла
+./distrib/debian/create-deb.sh
+
+# Способ установки:
+sudo dpkg -i ktlg2-VERSION.dev
 ```
 
 ## Установка
