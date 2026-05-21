@@ -195,3 +195,7 @@ VERSION = {{ read_file("./shard.yml").split('\n').find(&.starts_with?("version: 
 ## 2026-05-21 — make bump
 
 Добавлен `make bump` — запускает `distrib/bump-version.sh`, который анализирует `git log` от последнего тега по Conventional Commits, обновляет `shard.yml` и печатает команды для коммита и тега.
+
+## 2026-05-21 — make build: создание bin/ перед сборкой
+
+В `make build` и `make static` добавлен `mkdir -p bin` — при отсутствии директории `bin/` линкер (`ld`) не может записать выходной файл.
