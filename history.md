@@ -150,3 +150,7 @@ VERSION = {{ read_file("./shard.yml").split('\n').find(&.starts_with?("version: 
 **CI**: В `ci.yml` добавлен шаг сборки `bin/ameba` перед запуском линтера.
 
 **Release**: В `release.yml` закомментированы сборки под macOS (не тестируются).
+
+## 2026-05-21 — make install
+
+**Makefile**: Добавлена цель `install`. Сначала пытается установить в `/usr/local/bin` через sudo. Если sudo недоступен — ставит в `~/.local/bin` и предлагает добавить его в PATH через `.bashrc`, если его там нет.

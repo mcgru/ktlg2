@@ -19,6 +19,9 @@ help:
 	@echo "  fix       применить форматирование"
 	@echo "  check     test + lint + format"
 	@echo
+	@echo "Установка:"
+	@echo "  install   установить в /usr/local/bin (sudo) либо ~/.local/bin"
+	@echo
 	@echo "Прочее:"
 	@echo "  clean     удалить бинарники"
 	@echo "  help      этот список"
@@ -55,6 +58,37 @@ fix:
 	crystal tool format
 
 check: test lint format
+
+# --- Установка ---
+
+BIN_PATH := bin/$(BIN)
+
+# Префикс для sudo — пустой, если уже root
+SUDO := $(if $(filter root,$(shell whoami 2>/dev/null)),,sudo)
+
+INSTALL_SYSDIR := /usr/local/bin
+INSTALL_USERDIR := $(HOME)/.local/bin
+
+install: $(BIN_PATH)
+	@if [ -w $(INSTALL_SYSDIR) ] || $(SUDO) test -w $(INSTALL_SYSDIR) 2>/dev/null; then \
+	  mkdir -p $(INSTALL_SYSDIR) 2>/dev/null; \
+	  $(SUDO) cp $(BIN_PATH) $(INSTALL_SYSDIR)/$(BIN); \
+	  $(SUDO) chmod 755 $(INSTALL_SYSDIR)/$(BIN); \
+	  echo "Installed: $(INSTALL_SYSDIR)/$(BIN)"; \
+	else \
+	  echo "$(INSTALL_SYSDIR) not writable, trying $(INSTALL_USERDIR)..."; \
+	  mkdir -p $(INSTALL_USERDIR); \
+	  cp $(BIN_PATH) $(INSTALL_USERDIR)/$(BIN); \
+	  chmod 755 $(INSTALL_USERDIR)/$(BIN); \
+	  echo "Installed: $(INSTALL_USERDIR)/$(BIN)"; \
+	  if ! grep -qs '$$HOME/.local/bin' $(HOME)/.bashrc 2>/dev/null && ! grep -qs '~/.local/bin' $(HOME)/.bashrc 2>/dev/null; then \
+	    echo; \
+	    echo "  NOTE: Add ~/.local/bin to your PATH by running:"; \
+	    echo; \
+	    echo "    echo 'export PATH=\"\$$HOME/.local/bin:\$$PATH\"' >> ~/.bashrc && source ~/.bashrc"; \
+	    echo; \
+	  fi; \
+	fi
 
 # --- Очистка ---
 
