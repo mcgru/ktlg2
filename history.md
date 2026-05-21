@@ -110,3 +110,23 @@ prefixed = cleaned.map { |c| "#{year}.#{c}" }
 **README.md**: Создан с описанием команд и примерами использования.
 
 **Версия**: 0.1.0 → 0.1.3 (документационные и инфраструктурные коммиты).
+
+## 2026-05-21 — Code quality, CI/CD, тесты, Dockerfile, docs, Makefile
+
+**Code quality**:
+- Ameba (v1.6.4) добавлен как dev-зависимость — 0 failures на 22 файлах
+- `.ameba.yml` с конфигом (отключены BlockParameterName, VerboseBlock, QueryBoolMethods, CyclomaticComplexity)
+- `src/ktlg2/version.cr` — константа `Ktlg2::VERSION`
+- Исправлены shadowing, unused args, `.sort` → `.sort!`, `.any?` → `!.empty?`
+
+**CI/CD** (`.github/workflows/`):
+- `ci.yml` — 4 jobs: format → lint → test (matrix: latest, 1.15, 1.14) → build. Кэширование shards через `hashFiles(shard.lock)`
+- `release.yml` — на тег `v*`: сборка под linux x86_64, macOS x86_64, macOS arm64 + GitHub Release с `generate_release_notes`
+
+**Тесты**: +5 spec-файлов (renamer, toucher, flattener, checker, dup_finder). Итого 37 examples, 0 failures.
+
+**Dockerfile**: Multi-stage — `crystallang/crystal:1.20-alpine` (builder) → `alpine:3.23` (runtime). Сборка `--static --release`.
+
+**Документация**: Doc-комментарии во всех модулях, `crystal docs` генерирует HTML.
+
+**Makefile**: Цели build, static, docker, test, lint, format/fix, check, clean.
