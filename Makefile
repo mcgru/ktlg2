@@ -2,7 +2,7 @@ BIN    := ktlg2
 SRC    := src/main.cr
 SHARD  := shard.yml
 
-.PHONY: help build static docker test lint format fix check test-install deps-check deps-install install install-local install-global clean
+.PHONY: help build static docker test lint format fix check test-install deps-check deps-install bump install install-local install-global clean
 
 help:
 	@echo "Usage: make <target>"
@@ -28,6 +28,9 @@ help:
 	@echo "Зависимости:"
 	@echo "  deps-check     проверить наличие системных зависимостей"
 	@echo "  deps-install   показать команду для установки зависимостей"
+	@echo
+	@echo "Версионирование:"
+	@echo "  bump      увеличить версию по коммитам (Conventional Commits)"
 	@echo
 	@echo "Прочее:"
 	@echo "  clean     удалить бинарники"
@@ -107,6 +110,11 @@ deps-install:
 	@echo
 	@echo "  sudo apt-get install -y $(DEPS_PKG)"
 	@echo
+
+# --- Версионирование ---
+
+bump:
+	@bash distrib/bump-version.sh
 
 # --- Установка ---
 
