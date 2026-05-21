@@ -77,7 +77,7 @@ test-install:
 # --- Зависимости ---
 
 DEPS_BIN     := crystal ffprobe git make
-DEPS_PKG     := crystal libexif-dev libgc-dev ffmpeg git make
+DEPS_PKG     := libexif-dev libgc-dev ffmpeg git make
 ###DEPS_REPO    := https://packagecloud.io/install/repositories/crystal/install/script.deb.sh
 DEPS_REPO    := curl -fsSL https://crystal-lang.org/install.sh
 deps-check:
