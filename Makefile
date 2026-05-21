@@ -2,7 +2,7 @@ BIN    := ktlg2
 SRC    := src/main.cr
 SHARD  := shard.yml
 
-.PHONY: help build static docker test lint format fix check clean
+.PHONY: help build static docker test lint format fix check install install-local install-global clean
 
 help:
 	@echo "Usage: make <target>"
@@ -20,7 +20,9 @@ help:
 	@echo "  check     test + lint + format"
 	@echo
 	@echo "Установка:"
-	@echo "  install   установить в /usr/local/bin (sudo) либо ~/.local/bin"
+	@echo "  install-global   установить в /usr/local/bin (через sudo)"
+	@echo "  install-local    установить в ~/.local/bin"
+	@echo "  install          подсказка, использовать install-local/install-global"
 	@echo
 	@echo "Прочее:"
 	@echo "  clean     удалить бинарники"
@@ -62,32 +64,34 @@ check: test lint format
 # --- Установка ---
 
 BIN_PATH := bin/$(BIN)
-
-# Префикс для sudo — пустой, если уже root
 SUDO := $(if $(filter root,$(shell whoami 2>/dev/null)),,sudo)
-
 INSTALL_SYSDIR := /usr/local/bin
 INSTALL_USERDIR := $(HOME)/.local/bin
 
 install: $(BIN_PATH)
-	@if [ -w $(INSTALL_SYSDIR) ] || $(SUDO) test -w $(INSTALL_SYSDIR) 2>/dev/null; then \
-	  mkdir -p $(INSTALL_SYSDIR) 2>/dev/null; \
-	  $(SUDO) cp $(BIN_PATH) $(INSTALL_SYSDIR)/$(BIN); \
-	  $(SUDO) chmod 755 $(INSTALL_SYSDIR)/$(BIN); \
-	  echo "Installed: $(INSTALL_SYSDIR)/$(BIN)"; \
-	else \
-	  echo "$(INSTALL_SYSDIR) not writable, trying $(INSTALL_USERDIR)..."; \
-	  mkdir -p $(INSTALL_USERDIR); \
-	  cp $(BIN_PATH) $(INSTALL_USERDIR)/$(BIN); \
-	  chmod 755 $(INSTALL_USERDIR)/$(BIN); \
-	  echo "Installed: $(INSTALL_USERDIR)/$(BIN)"; \
-	  if ! grep -qs '$$HOME/.local/bin' $(HOME)/.bashrc 2>/dev/null && ! grep -qs '~/.local/bin' $(HOME)/.bashrc 2>/dev/null; then \
-	    echo; \
-	    echo "  NOTE: Add ~/.local/bin to your PATH by running:"; \
-	    echo; \
-	    echo "    echo 'export PATH=\"\$$HOME/.local/bin:\$$PATH\"' >> ~/.bashrc && source ~/.bashrc"; \
-	    echo; \
-	  fi; \
+	@echo "Usage: make install-global  (installs to /usr/local/bin via sudo)"
+	@echo "       make install-local   (installs to $$HOME/.local/bin)"
+	@echo
+	@echo "Run one of the above instead."
+	@false
+
+install-global: $(BIN_PATH)
+	@mkdir -p $(INSTALL_SYSDIR) 2>/dev/null; \
+	$(SUDO) cp $(BIN_PATH) $(INSTALL_SYSDIR)/$(BIN); \
+	$(SUDO) chmod 755 $(INSTALL_SYSDIR)/$(BIN); \
+	echo "Installed: $(INSTALL_SYSDIR)/$(BIN)"
+
+install-local: $(BIN_PATH)
+	@mkdir -p $(INSTALL_USERDIR); \
+	cp $(BIN_PATH) $(INSTALL_USERDIR)/$(BIN); \
+	chmod 755 $(INSTALL_USERDIR)/$(BIN); \
+	echo "Installed: $(INSTALL_USERDIR)/$(BIN)"; \
+	if ! grep -qs 'HOME/.local/bin' $(HOME)/.bashrc 2>/dev/null && ! grep -qs '~/.local/bin' $(HOME)/.bashrc 2>/dev/null; then \
+	  echo; \
+	  echo "  NOTE: Add ~/.local/bin to your PATH by running:"; \
+	  echo; \
+	  echo "    echo 'export PATH=\"\$$HOME/.local/bin:\$$PATH\"' >> ~/.bashrc && source ~/.bashrc"; \
+	  echo; \
 	fi
 
 # --- Очистка ---

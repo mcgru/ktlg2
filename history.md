@@ -154,3 +154,7 @@ VERSION = {{ read_file("./shard.yml").split('\n').find(&.starts_with?("version: 
 ## 2026-05-21 — make install
 
 **Makefile**: Добавлена цель `install`. Сначала пытается установить в `/usr/local/bin` через sudo. Если sudo недоступен — ставит в `~/.local/bin` и предлагает добавить его в PATH через `.bashrc`, если его там нет.
+
+## 2026-05-21 — make install разделён на install-local и install-global
+
+`make install` теперь выводит подсказку с предложением запустить `make install-local` или `make install-global` и завершается с ошибкой. `install-global` ставит в `/usr/local/bin` через sudo, `install-local` — в `~/.local/bin` с проверкой PATH в `.bashrc`.
