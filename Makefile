@@ -2,9 +2,26 @@ BIN    := ktlg2
 SRC    := src/main.cr
 SHARD  := shard.yml
 
-.PHONY: all build static docker test lint format check clean
+.PHONY: help build static docker test lint format fix check clean
 
-all: test lint format
+help:
+	@echo "Usage: make <target>"
+	@echo
+	@echo "Сборка:"
+	@echo "  build     release-бинарник bin/$(BIN)"
+	@echo "  static    статический бинарник bin/$(BIN).static"
+	@echo "  docker    собрать Docker-образ"
+	@echo
+	@echo "Тесты и качество:"
+	@echo "  test      crystal spec"
+	@echo "  lint      ameba"
+	@echo "  format    проверка форматирования (crystal tool format --check)"
+	@echo "  fix       применить форматирование"
+	@echo "  check     test + lint + format"
+	@echo
+	@echo "Прочее:"
+	@echo "  clean     удалить бинарники"
+	@echo "  help      этот список"
 
 # --- Сборка ---
 
@@ -36,8 +53,6 @@ format:
 
 fix:
 	crystal tool format
-
-# --- Всё сразу ---
 
 check: test lint format
 

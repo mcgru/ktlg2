@@ -129,4 +129,4 @@ prefixed = cleaned.map { |c| "#{year}.#{c}" }
 
 **Документация**: Doc-комментарии во всех модулях, `crystal docs` генерирует HTML.
 
-**Makefile**: Цели build, static, docker, test, lint, format/fix, check, clean.
+**Makefile**: Цели build, static, docker, test, lint, format/fix, check, clean, help (по умолчанию).
