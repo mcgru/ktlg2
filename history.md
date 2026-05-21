@@ -187,3 +187,7 @@ VERSION = {{ read_file("./shard.yml").split('\n').find(&.starts_with?("version: 
 `make deps-check` проверяет наличие crystal, ffprobe, git, make, libexif-dev. Если чего-то не хватает — показывает список и завершается с ошибкой, предлагая `make deps-install`.
 
 `make deps-install` печатает команду для установки всех зависимостей на Debian/Ubuntu (curl + apt-get).
+
+## 2026-05-21 — deps-install: удобный копипаст
+
+`make deps-install` теперь выводит `curl | sudo bash` и `sudo apt-get install` на отдельных строках, чтобы каждую можно было выделить и скопировать дабл-кликом.
