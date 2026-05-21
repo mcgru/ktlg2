@@ -181,3 +181,9 @@ VERSION = {{ read_file("./shard.yml").split('\n').find(&.starts_with?("version: 
 2. `make install-local` / `make install-global`
 3. Docker (`make docker`, `docker run -v`)
 4. deb-пакет (`create-deb.sh` + `dpkg -i`)
+
+## 2026-05-21 — deps-check / deps-install в Makefile
+
+`make deps-check` проверяет наличие crystal, ffprobe, git, make, libexif-dev. Если чего-то не хватает — показывает список и завершается с ошибкой, предлагая `make deps-install`.
+
+`make deps-install` печатает команду для установки всех зависимостей на Debian/Ubuntu (curl + apt-get).

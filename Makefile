@@ -2,7 +2,7 @@ BIN    := ktlg2
 SRC    := src/main.cr
 SHARD  := shard.yml
 
-.PHONY: help build static docker test lint format fix check test-install install install-local install-global clean
+.PHONY: help build static docker test lint format fix check test-install deps-check deps-install install install-local install-global clean
 
 help:
 	@echo "Usage: make <target>"
@@ -24,6 +24,10 @@ help:
 	@echo "  install-local    установить в ~/.local/bin"
 	@echo "  install          подсказка, использовать install-local/install-global"
 	@echo "  test-install     spec для make install"
+	@echo
+	@echo "Зависимости:"
+	@echo "  deps-check     проверить наличие системных зависимостей"
+	@echo "  deps-install   показать команду для установки зависимостей"
 	@echo
 	@echo "Прочее:"
 	@echo "  clean     удалить бинарники"
@@ -64,6 +68,45 @@ check: test lint format test-install
 
 test-install:
 	@bash spec/test_install.sh
+
+# --- Зависимости ---
+
+DEPS_BIN     := crystal ffprobe git make
+DEPS_PKG     := crystal libexif-dev ffmpeg git make
+DEPS_REPO    := https://packagecloud.io/install/repositories/crystal/install/script.deb.sh
+DEPS_INSTALL := curl -fsSL $(DEPS_REPO) | sudo bash && sudo apt-get install -y $(DEPS_PKG)
+
+deps-check:
+	@echo "Checking dependencies..."; \
+	missing=""; \
+	for bin in $(DEPS_BIN); do \
+	  if command -v $$bin >/dev/null 2>&1; then \
+	    echo "  [ok]  $$bin"; \
+	  else \
+	    echo "  [missing]  $$bin"; \
+	    missing="$$missing $$bin"; \
+	  fi; \
+	done; \
+	if dpkg -l libexif-dev >/dev/null 2>&1; then \
+	  echo "  [ok]  libexif-dev"; \
+	else \
+	  echo "  [missing]  libexif-dev"; \
+	  missing="$$missing libexif-dev"; \
+	fi; \
+	if [ -n "$$missing" ]; then \
+	  echo; \
+	  echo "  Run: make deps-install"; \
+	  exit 1; \
+	else \
+	  echo; \
+	  echo "All dependencies satisfied."; \
+	fi
+
+deps-install:
+	@echo "Install system dependencies:"
+	@echo
+	@echo "  $(DEPS_INSTALL)"
+	@echo
 
 # --- Установка ---
 
