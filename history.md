@@ -140,3 +140,13 @@ prefixed = cleaned.map { |c| "#{year}.#{c}" }
 VERSION = {{ read_file("./shard.yml").split('\n').find(&.starts_with?("version: ")).gsub(/version: /, "").strip }}
 ```
 Единственный источник истины — `shard.yml`. `version.cr` получает значение автоматически при каждой компиляции.
+
+## 2026-05-21 — --version флаг, фикс help, Ameba в CI
+
+**`--version`**: Добавлен флаг `-V`/`--version` в OptionParser. Выводит `ktlg2 v<VERSION>` из `Ktlg2::VERSION`.
+
+**help**: Убрано дублирование `--help` в выводе `print_help` (было дважды).
+
+**CI**: В `ci.yml` добавлен шаг сборки `bin/ameba` перед запуском линтера.
+
+**Release**: В `release.yml` закомментированы сборки под macOS (не тестируются).

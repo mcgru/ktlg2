@@ -32,6 +32,7 @@ jobs:
           path: lib
           key: shards-${{ runner.os }}-${{ hashFiles('shard.lock') }}
       - run: shards install
+      - run: crystal build -Dpreview_mt -o bin/ameba lib/ameba/bin/ameba.cr
       - run: bin/ameba
 
   test:

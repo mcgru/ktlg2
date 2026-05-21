@@ -64,6 +64,11 @@ module Ktlg2
           config.apply_path = apply_path
         end
 
+        opts.on("-V", "--version", "Show version") do
+          puts "ktlg2 v#{Ktlg2::VERSION}"
+          exit(0)
+        end
+
         opts.on("-h", "--help", "Show this help") do
           print_help
           exit(0)
@@ -152,7 +157,7 @@ module Ktlg2
       puts "  -v, --verbose      Verbose output"
       puts "      --dry-run      Do not change files, just preview"
       puts "      --json         JSON output (check, dups, dry-run)"
-      puts "      --help           This help"
+      puts "  -V, --version       Show version"
       puts "      --apply PATH     Apply dups resolution from .dups folder"
       puts "  -j, --jobs N        Number of parallel jobs (default: CPU count)"
       puts "  -h, --help          This help"
