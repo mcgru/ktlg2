@@ -74,8 +74,6 @@ test-install:
 DEPS_BIN     := crystal ffprobe git make
 DEPS_PKG     := crystal libexif-dev ffmpeg git make
 DEPS_REPO    := https://packagecloud.io/install/repositories/crystal/install/script.deb.sh
-DEPS_INSTALL := curl -fsSL $(DEPS_REPO) | sudo bash && sudo apt-get install -y $(DEPS_PKG)
-
 deps-check:
 	@echo "Checking dependencies..."; \
 	missing=""; \
@@ -105,7 +103,9 @@ deps-check:
 deps-install:
 	@echo "Install system dependencies:"
 	@echo
-	@echo "  $(DEPS_INSTALL)"
+	@echo "  curl -fsSL $(DEPS_REPO) | sudo bash"
+	@echo
+	@echo "  sudo apt-get install -y $(DEPS_PKG)"
 	@echo
 
 # --- Установка ---
