@@ -1,8 +1,12 @@
 module Ktlg2
-  # Команда plane. Собирает все файлы из поддиректорий в корневую директорию.
+  # Команда plane.
+  #
+  # Собирает все файлы из поддиректорий в корневую директорию.
+  # Удаляет опустевшие поддиректории. Обрабатывает коллизии имён
+  # через MD5-сравнение (одинаковые удаляются, разные нумеруются).
   #
   # bash-оригинал, строки 185-190:
-  #   xargs mv -n -t "$P"  +  find -type d -empty -delete
+  # `xargs mv -n -t "$P"` + `find -type d -empty -delete`
   module Flattener
     extend self
 
@@ -10,7 +14,7 @@ module Ktlg2
       path = File.realpath(config.path)
       files = Dir.glob("#{path}/**/*")
         .select { |e| File.file?(e) && !File.symlink?(e) }
-        .sort
+        .sort!
 
       moved_count = 0
       collision_count = 0
@@ -74,7 +78,7 @@ module Ktlg2
     private def delete_empty_dirs(path : String) : Nil
       loop do
         deleted = false
-        Dir.glob("#{path}/**/").sort.reverse.each do |dir|
+        Dir.glob("#{path}/**/").sort!.reverse!.each do |dir|
           next unless Dir.exists?(dir)
           next if dir.rstrip('/') == path
           begin

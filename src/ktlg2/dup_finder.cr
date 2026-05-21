@@ -1,17 +1,24 @@
 module Ktlg2
-  # Команда dups. Ищет дубликаты по содержимому (полный MD5).
+  # Команда dups.
   #
-  # Режимы:
-  #   - Без --apply: найти дубликаты + создать {path}.dups с hardlink-копиями
-  #   - С --apply: прочитать .dups, оставить только файлы, отмеченные пользователем
+  # Ищет дубликаты по содержимому (полный MD5).
   #
-  # Структура .dups:
-  #   {path}.dups/{hash}/{rel/path/file}  (hardlink)
+  # ## Режимы
   #
-  # Workflow:
-  #   1. dups /path        — найти дубликаты, создать .dups
-  #   2. (руками удалить лишнее из .dups/*/)
-  #   3. dups --apply /path.dups /path  — применить решение
+  # **Без --apply**: найти дубликаты + создать `{path}.dups` с hardlink-копиями.
+  #
+  # **С --apply**: прочитать `.dups`, оставить только файлы, отмеченные
+  # пользователем, остальные переместить в `.problems`.
+  #
+  # ## Структура .dups
+  #
+  # `{path}.dups/{hash}/{rel/path/file}` (hardlink)
+  #
+  # ## Workflow
+  #
+  # 1. `ktlg2 dups /path` — найти дубликаты, создать `.dups`
+  # 2. (руками удалить лишнее из `.dups/*/`)
+  # 3. `ktlg2 dups --apply /path.dups /path` — применить решение
   module DupFinder
     extend self
 
@@ -25,7 +32,7 @@ module Ktlg2
 
       files = Dir.glob("#{path}/**/*")
         .select { |e| File.file?(e) && !File.symlink?(e) }
-        .sort
+        .sort!
 
       # Группировка по размеру (быстрый фильтр).
       by_size = {} of Int64 => Array(String)
@@ -74,7 +81,7 @@ module Ktlg2
     private def create_dup_links(
       config : Config,
       path : String,
-      groups : Array({hash: String, size: Int64, files: Array(String)})
+      groups : Array({hash: String, size: Int64, files: Array(String)}),
     ) : Nil
       return if groups.empty? || config.dry_run
 
@@ -180,7 +187,7 @@ module Ktlg2
             moved += 1
           end
         else
-          kept += 1  # Не дубликат — не трогаем.
+          kept += 1 # Не дубликат — не трогаем.
         end
       end
 
@@ -193,7 +200,7 @@ module Ktlg2
     private def delete_empty_dirs(path : String) : Nil
       loop do
         deleted = false
-        Dir.glob("#{path}/**/").sort.reverse.each do |dir|
+        Dir.glob("#{path}/**/").sort!.reverse!.each do |dir|
           next unless Dir.exists?(dir)
           begin
             Dir.delete(dir)

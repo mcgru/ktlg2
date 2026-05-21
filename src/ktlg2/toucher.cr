@@ -1,7 +1,9 @@
 module Ktlg2
-  # Команда touch. Выставляет mtime файла из даты, полученной из метаданных.
+  # Команда touch.
   #
-  # Не использует filesystem как источник (чтобы не было круговой логики).
+  # Выставляет mtime файла из даты, полученной из метаданных.
+  # Не использует `Filesystem` как источник (чтобы не было круговой логики).
+  #
   # bash-оригинал, строки 122-156.
   module Toucher
     extend self
@@ -10,7 +12,7 @@ module Ktlg2
       path = File.realpath(config.path)
       files = Dir.glob("#{path}/**/*")
         .select { |e| File.file?(e) && !File.symlink?(e) }
-        .sort
+        .sort!
 
       touched_count = 0
       skipped_count = 0

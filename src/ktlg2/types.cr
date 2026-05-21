@@ -2,7 +2,7 @@ require "json"
 
 module Ktlg2
   # Источник, из которого получена дата файла.
-  # Приоритет: Exif -> Video -> Filename -> Filesystem
+  # Приоритет: `Exif` -> `Video` -> `Filename` -> `Filesystem`
   enum TimestampSource
     Exif
     Video
@@ -19,7 +19,7 @@ module Ktlg2
     end
   end
 
-  # Действие, которое выполнит organize (для dry-run / JSON).
+  # Действие, которое выполнит organize (для dry-run / JSON-вывода).
   struct OrganizeAction
     getter source : String
     getter target : String
@@ -39,12 +39,19 @@ module Ktlg2
 
   # Глобальная конфигурация, заполняется из CLI-аргументов.
   class Config
+    # Путь к целевой директории.
     property path : String
+    # Подробный вывод в STDERR.
     property verbose : Bool
+    # Режим просмотра без изменений.
     property dry_run : Bool
+    # Вывод в JSON (check, dups, dry-run).
     property json_output : Bool
+    # Количество параллельных задач (не используется).
     property jobs : Int32
+    # Имя команды (organize, rename, touch, plane, check, dups).
     property command : String
+    # Путь к .dups для --apply.
     property apply_path : String
 
     def initialize(@path = "",
@@ -58,6 +65,6 @@ module Ktlg2
   end
 
   # Минимальный валидный timestamp (1992-01-01).
-  #bash-скрипт:     694202400
+  # bash-скрипт:     694202400
   MIN_VALID_TS = 694_202_400_i64
 end

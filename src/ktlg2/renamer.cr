@@ -1,20 +1,24 @@
 module Ktlg2
-  # Команда rename. Переименовывает файлы в канонический формат:
-  #   YYMMDD-HHMMSS.XXXXXXX.z.ext
+  # Команда rename.
   #
-  # Где XXXXXXX — первые 7 символов MD5 первых 25600 байт.
+  # Переименовывает файлы в канонический формат:
+  # `YYMMDD-HHMMSS.XXXXXXX.z.ext`
+  #
+  # Где `XXXXXXX` — первые 7 символов MD5 первых 25600 байт.
+  # Дата извлекается через `Extractor`, при отсутствии — из mtime.
+  #
   # bash-оригинал, строки 134-202.
   module Renamer
     extend self
 
     MD5_BYTES = 25_600
-    MD5_CHARS = 7
+    MD5_CHARS =      7
 
     def run(config : Config) : Nil
       path = File.realpath(config.path)
       files = Dir.glob("#{path}/**/*")
         .select { |e| File.file?(e) && !File.symlink?(e) }
-        .sort
+        .sort!
 
       if config.dry_run
         files.each do |f|
@@ -54,7 +58,6 @@ module Ktlg2
 
     # Сформировать каноническое имя файла.
     def canonical_name(path : String) : String
-      basename = File.basename(path)
       ext = File.extname(path)
 
       ts = Extractor.extract_timestamp(path)

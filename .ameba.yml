@@ -1,0 +1,11 @@
+Naming/BlockParameterName:
+  Enabled: false
+
+Naming/QueryBoolMethods:
+  Enabled: false
+
+Style/VerboseBlock:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false

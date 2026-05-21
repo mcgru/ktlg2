@@ -3,4 +3,5 @@ lib/
 tests/src.files
 old.bash/
 bin/
+docs/
 *.deb

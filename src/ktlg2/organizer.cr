@@ -2,9 +2,10 @@ module Ktlg2
   # Команда organize — основной режим.
   #
   # Раскладывает файлы по папкам:
-  #   {path}.years/{год[.суффикс]}/{год-месяц}/
+  # `{path}.years/{год[.суффикс]}/{год-месяц}/`
   #
-  # Потом переименовывает {path}.years в {год[-макс]}[.суффикс].
+  # Потом переименовывает `{path}.years` в `{год[-макс]}[.суффикс]`.
+  # Исходная папка переименовывается в `{path}.problems`.
   #
   # Полностью повторяет логику bash-скрипта (строки 229-306).
   module Organizer
@@ -23,8 +24,8 @@ module Ktlg2
       suffix = base_name.sub(/^[0-9._-]+/, "")
       suffix = suffix.size > 1 ? suffix : ""
 
-      STDERR.puts "Source: #{path}"          if config.verbose
-      STDERR.puts "Suffix: '#{suffix}'"      if config.verbose
+      STDERR.puts "Source: #{path}" if config.verbose
+      STDERR.puts "Suffix: '#{suffix}'" if config.verbose
 
       years_dir = "#{path}.years"
 
@@ -114,7 +115,7 @@ module Ktlg2
       files : Array(String),
       root : String,
       years_dir : String,
-      suffix : String
+      suffix : String,
     ) : Array(OrganizeAction)
       actions = [] of OrganizeAction
 
@@ -130,7 +131,7 @@ module Ktlg2
       file : String,
       root : String,
       years_dir : String,
-      suffix : String
+      suffix : String,
     ) : OrganizeAction?
       # Проверка на пустой/битый файл.
       file_size = File.size(file)
@@ -191,7 +192,7 @@ module Ktlg2
       year : String,
       suffix : String,
       subject : String,
-      year_month : String
+      year_month : String,
     ) : String
       base_dir = suffix.empty? ? year : "#{year}.#{suffix}"
 
@@ -206,7 +207,7 @@ module Ktlg2
 
     private def execute_actions(
       actions : Array(OrganizeAction),
-      config : Config
+      config : Config,
     ) : Nil
       actions.each do |action|
         case action.action
@@ -271,7 +272,7 @@ module Ktlg2
       years_dir : String,
       parent_dir : String,
       suffix : String,
-      config : Config
+      config : Config,
     ) : String
       final_name = compute_final_name(years_dir, suffix)
       final_path = "#{parent_dir}/#{final_name}"
@@ -296,8 +297,8 @@ module Ktlg2
     private def compute_final_name(years_dir : String, suffix : String) : String
       year_dirs = Dir.glob("#{years_dir}/*")
         .select { |e| File.directory?(e) }
-        .map { |e| File.basename(e).sub(/\..*/, "") }  # только числовой префикс
-        .sort
+        .map { |e| File.basename(e).sub(/\..*/, "") } # только числовой префикс
+        .sort!
 
       return File.basename(years_dir).sub(/\.years$/, "") if year_dirs.empty?
 
@@ -332,7 +333,7 @@ module Ktlg2
     # Проставить mtime на все папки по последнему mtime их содержимого.
     # Обработка снизу вверх: дочерние папки проставляются раньше родительских.
     private def touch_dirs(root : String) : Nil
-      dirs = Dir.glob("#{root}/**/").sort.reverse
+      dirs = Dir.glob("#{root}/**/").sort!.reverse!
 
       dirs.each do |dir|
         dir = dir.rstrip('/')
@@ -359,7 +360,7 @@ module Ktlg2
     private def delete_empty_dirs(path : String, keep_root : Bool = false) : Nil
       loop do
         deleted = false
-        Dir.glob("#{path}/**/").sort.reverse.each do |dir|
+        Dir.glob("#{path}/**/").sort!.reverse!.each do |dir|
           next unless Dir.exists?(dir)
           next if keep_root && dir.rstrip('/') == path
           begin
@@ -384,7 +385,7 @@ module Ktlg2
 
     private def report_actions(
       actions : Array(OrganizeAction),
-      config : Config
+      config : Config,
     ) : Nil
       if config.json_output
         puts actions.to_json

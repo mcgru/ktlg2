@@ -1,5 +1,9 @@
 module Ktlg2
-  # Команда check. Проверяет, совпадает ли дата в имени файла с mtime.
+  # Команда check.
+  #
+  # Проверяет, совпадает ли дата в имени файла с mtime на диске.
+  # Использует только `parse_filename` (не EXIF/ФС) для определения даты
+  # из имени. Выводит список несовпадений или JSON-отчёт.
   #
   # bash-оригинал, строки 161-183.
   module Checker
@@ -9,7 +13,7 @@ module Ktlg2
       path = File.realpath(config.path)
       files = Dir.glob("#{path}/**/*")
         .select { |e| File.file?(e) && !File.symlink?(e) }
-        .sort
+        .sort!
 
       results = [] of NamedTuple(file: String, filename_date: String?, mtime_date: String?, match: Bool)
 
@@ -28,10 +32,10 @@ module Ktlg2
                 end
 
         results << {
-          file: f,
+          file:          f,
           filename_date: filename_date,
-          mtime_date: mtime_date,
-          match: match,
+          mtime_date:    mtime_date,
+          match:         match,
         }
       end
 

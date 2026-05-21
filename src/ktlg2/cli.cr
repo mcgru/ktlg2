@@ -1,14 +1,16 @@
 module Ktlg2
   # Разбор аргументов командной строки и диспетчеризация по командам.
   #
+  # ```
   # Usage:
-  #   ktlg2 [global-opts] [команда|алиас] <PATH>
+  #   ktlg2 [global-opts] [команда|алиас] &lt;PATH&gt;
   #
   # Примеры:
   #   ktlg2 /path/to/photos                   # organize по умолчанию
   #   ktlg2 o /path/to/photos                 # алиас organize
   #   ktlg2 rename --dry-run /path/to/photos  # rename вхолостую
   #   ktlg2 dups --json /path/to/photos       # дубликаты в JSON
+  # ```
   module Cli
     # Каноническое имя команды и её алиасы.
     COMMANDS = {
@@ -27,8 +29,8 @@ module Ktlg2
       config = parse_args(args)
 
       STDERR.puts "Command: #{config.command}" if config.verbose
-      STDERR.puts "Path:    #{config.path}"    if config.verbose
-      STDERR.puts "Jobs:    #{config.jobs}"    if config.verbose
+      STDERR.puts "Path:    #{config.path}" if config.verbose
+      STDERR.puts "Jobs:    #{config.jobs}" if config.verbose
 
       dispatch(config)
     end
@@ -38,40 +40,40 @@ module Ktlg2
       config = Config.new
       positional = [] of String
 
-      parser = OptionParser.new do |parser|
-        parser.banner = "Usage: ktlg2 [options] [command] <PATH>"
+      parser = OptionParser.new do |opts|
+        opts.banner = "Usage: ktlg2 [options] [command] <PATH>"
 
-        parser.on("-v", "--verbose", "Verbose output") do
+        opts.on("-v", "--verbose", "Verbose output") do
           config.verbose = true
         end
 
-        parser.on("--dry-run", "Do not change files, just preview") do
+        opts.on("--dry-run", "Do not change files, just preview") do
           config.dry_run = true
         end
 
-        parser.on("--json", "JSON output (check, dups, dry-run)") do
+        opts.on("--json", "JSON output (check, dups, dry-run)") do
           config.json_output = true
         end
 
-        parser.on("-j", "--jobs N", "Number of parallel jobs (default: CPU count)") do |n|
-          val = n.to_i?
+        opts.on("-j", "--jobs N", "Number of parallel jobs (default: CPU count)") do |num|
+          val = num.to_i?
           config.jobs = val.nil? || val <= 0 ? System.cpu_count : val
         end
 
-        parser.on("--apply PATH", "Apply dups resolution from .dups folder") do |p|
-          config.apply_path = p
+        opts.on("--apply PATH", "Apply dups resolution from .dups folder") do |apply_path|
+          config.apply_path = apply_path
         end
 
-        parser.on("-h", "--help", "Show this help") do
+        opts.on("-h", "--help", "Show this help") do
           print_help
           exit(0)
         end
 
-        parser.unknown_args do |args|
-          positional.concat(args)
+        opts.unknown_args do |unknown|
+          positional.concat(unknown)
         end
 
-        parser.invalid_option do |flag|
+        opts.invalid_option do |flag|
           STDERR.puts "WARNING: unknown option: #{flag}"
         end
       end
@@ -79,7 +81,7 @@ module Ktlg2
       parser.parse(args)
 
       # Первый позиционный аргумент может быть командой или алиасом.
-      if positional.any?
+      if !positional.empty?
         cmd = recognize_command(positional[0])
         if cmd
           config.command = cmd
@@ -90,7 +92,7 @@ module Ktlg2
       end
 
       # Оставшиеся аргументы: ожидаем PATH.
-      if positional.any?
+      if !positional.empty?
         config.path = positional[0]
         if positional.size > 1
           STDERR.puts "WARNING: unexpected arguments: #{positional[1..].join(" ")}"

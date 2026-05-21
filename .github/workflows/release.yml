@@ -1,0 +1,47 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-linux-gnu
+          - os: macos-latest
+            target: x86_64-darwin
+          - os: macos-14
+            target: aarch64-darwin
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: crystal-lang/install-crystal@v1
+      - run: shards install
+      - run: |
+          crystal build src/main.cr \
+            --release \
+            --no-debug \
+            -o "ktlg2-${{ matrix.target }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ktlg2-${{ matrix.target }}
+          path: ktlg2-${{ matrix.target }}
+
+  release:
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: ktlg2-*
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: ktlg2-*
+          generate_release_notes: true

@@ -42,7 +42,7 @@ describe Ktlg2::Organizer do
         # Ищем по маске, т.к. точное имя зависит от годов.
         result_dirs = Dir.glob("#{parent}/*")
           .select { |d| File.directory?(d) && !d.includes?(".problems") }
-          .sort
+          .sort!
 
         result_dirs.should_not be_empty
 

@@ -4,19 +4,25 @@ module Ktlg2
   # Извлечение даты создания файла из доступных источников.
   #
   # Приоритет (как в bash-оригинале):
-  #   1. EXIF — метаданные изображения (JPEG, TIFF)
-  #   2. ffprobe — метаданные видео (MP4, MOV, AVI)
-  #   3. Имя файла — парсинг даты регулярками
-  #   4. Файловая система — mtime (только если нет другого источника)
   #
-  # Таймстемпы меньше 1992-01-01 (694202400) считаются невалидными.
+  # 1. **EXIF** — метаданные изображения (JPEG, TIFF)
+  # 2. **ffprobe** — метаданные видео (MP4, MOV, AVI)
+  # 3. **Имя файла** — парсинг даты регулярками
+  # 4. **Файловая система** — mtime (только если нет другого источника)
+  #
+  # Таймстемпы меньше 1992-01-01 (`MIN_VALID_TS`) считаются невалидными.
+  #
+  # ```
+  # Ktlg2::Extractor.extract_timestamp("photo.jpg")
+  # # => #&lt;Ktlg2::FileTimestamp @timestamp=..., @source=Exif&gt;
+  # ```
   module Extractor
     extend self
 
     # Расширения изображений, которые могут содержать EXIF.
     IMAGE_EXTS = {"jpg", "jpeg", "tif", "tiff", "png"}
     # Расширения видео, для которых используем ffprobe.
-    VIDEO_EXTS  = {"3gp", "avi", "mov", "mp4", "mpg", "mpeg"}
+    VIDEO_EXTS = {"3gp", "avi", "mov", "mp4", "mpg", "mpeg"}
 
     # Извлечь лучший доступный таймстемп для файла.
     #
@@ -174,12 +180,12 @@ module Ktlg2
 
       return 0_i64 unless date.size == 8 && time.size == 6
 
-      year  = date[0..3].to_i
+      year = date[0..3].to_i
       month = date[4..5].to_i
-      day   = date[6..7].to_i
-      hour  = time[0..1].to_i
-      min   = time[2..3].to_i
-      sec   = time[4..5].to_i
+      day = date[6..7].to_i
+      hour = time[0..1].to_i
+      min = time[2..3].to_i
+      sec = time[4..5].to_i
 
       return 0_i64 unless (1970..2100).covers?(year)
       return 0_i64 unless (1..12).covers?(month)
