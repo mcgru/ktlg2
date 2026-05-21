@@ -32,7 +32,7 @@ jobs:
           path: lib
           key: shards-${{ runner.os }}-${{ hashFiles('shard.lock') }}
       - run: shards install
-      - run: crystal build -Dpreview_mt -o bin/ameba lib/ameba/bin/ameba.cr
+      - run: mkdir -p bin && crystal build -Dpreview_mt -o bin/ameba lib/ameba/bin/ameba.cr
       - run: bin/ameba
 
   test:
@@ -65,7 +65,7 @@ jobs:
         with:
           crystal: ${{ env.CRYSTAL_VERSION }}
       - run: shards install
-      - run: crystal build src/main.cr --release -o bin/ktlg2
+      - run: mkdir -p bin && crystal build src/main.cr --release -o bin/ktlg2
       - uses: actions/upload-artifact@v4
         with:
           name: ktlg2-x86_64-linux
