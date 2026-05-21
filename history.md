@@ -199,3 +199,7 @@ VERSION = {{ read_file("./shard.yml").split('\n').find(&.starts_with?("version: 
 ## 2026-05-21 — make build: создание bin/ перед сборкой
 
 В `make build` и `make static` добавлен `mkdir -p bin` — при отсутствии директории `bin/` линкер (`ld`) не может записать выходной файл.
+
+## 2026-05-21 — libgc-dev добавлен в зависимости
+
+`libgc-dev` (Boehm GC, нужен для линковки Crystal) добавлен в `DEPS_PKG`, `deps-check`, `deps-install` и `INSTALL.md`.

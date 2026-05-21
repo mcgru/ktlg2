@@ -10,10 +10,10 @@ curl -fsSL https://crystal-lang.org/install.sh | sudo bash
 sudo apt-get install -y crystal
 
 # Системные библиотеки для ktlg2
-sudo apt-get install -y libexif-dev ffmpeg git make
+sudo apt-get install -y libexif-dev libgc-dev ffmpeg git make
 ```
 
-`libexif-dev` нужен для чтения EXIF из JPEG. `ffmpeg` предоставляет `ffprobe` для извлечения даты из MP4/AVI/MOV.
+`libexif-dev` нужен для чтения EXIF из JPEG. `libgc-dev` — сборщик мусора для Crystal (Boehm GC). `ffmpeg` предоставляет `ffprobe` для извлечения даты из MP4/AVI/MOV.
 
 ---
 

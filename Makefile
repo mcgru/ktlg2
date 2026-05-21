@@ -77,7 +77,7 @@ test-install:
 # --- Зависимости ---
 
 DEPS_BIN     := crystal ffprobe git make
-DEPS_PKG     := crystal libexif-dev ffmpeg git make
+DEPS_PKG     := crystal libexif-dev libgc-dev ffmpeg git make
 ###DEPS_REPO    := https://packagecloud.io/install/repositories/crystal/install/script.deb.sh
 DEPS_REPO    := curl -fsSL https://crystal-lang.org/install.sh
 deps-check:
@@ -91,12 +91,14 @@ deps-check:
 	    missing="$$missing $$bin"; \
 	  fi; \
 	done; \
-	if dpkg -l libexif-dev >/dev/null 2>&1; then \
-	  echo "  [ok]  libexif-dev"; \
-	else \
-	  echo "  [missing]  libexif-dev"; \
-	  missing="$$missing libexif-dev"; \
-	fi; \
+	for pkg in libexif-dev libgc-dev; do \
+	  if dpkg -l $$pkg >/dev/null 2>&1; then \
+	    echo "  [ok]  $$pkg"; \
+	  else \
+	    echo "  [missing]  $$pkg"; \
+	    missing="$$missing $$pkg"; \
+	  fi; \
+	done; \
 	if [ -n "$$missing" ]; then \
 	  echo; \
 	  echo "  Run: make deps-install"; \
