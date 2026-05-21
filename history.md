@@ -130,3 +130,13 @@ prefixed = cleaned.map { |c| "#{year}.#{c}" }
 **Документация**: Doc-комментарии во всех модулях, `crystal docs` генерирует HTML.
 
 **Makefile**: Цели build, static, docker, test, lint, format/fix, check, clean, help (по умолчанию).
+
+## 2026-05-21 — version.cr читает версию из shard.yml
+
+**Проблема**: Версия дублировалась в `shard.yml` и `src/ktlg2/version.cr`. При bump'е через `distrib/bump-version.sh` правился только `shard.yml`, рассинхрон.
+
+**Решение**: Макрос времени компиляции в `version.cr`:
+```crystal
+VERSION = {{ read_file("./shard.yml").split('\n').find(&.starts_with?("version: ")).gsub(/version: /, "").strip }}
+```
+Единственный источник истины — `shard.yml`. `version.cr` получает значение автоматически при каждой компиляции.
