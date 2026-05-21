@@ -96,3 +96,17 @@ prefixed = cleaned.map { |c| "#{year}.#{c}" }
 - Поддержка `--force` (как в bash)
 - Параллельная обработка через `spawn`/`Channel`
 - `check` с проверкой имен файлов (пока только даты)
+
+## 2026-05-19 — Git init, документация, Debian-пакет, bump-version
+
+**Git**: Репозиторий инициализирован, первый коммит (23 файла). В `.gitignore`: `.claude/`, `lib/`, `tests/src.files`, `old.bash/`, `bin/`, `*.deb`.
+
+**INSTALL.md**: Инструкция для Debian 12 — установка Crystal (официальный репозиторий), `libexif-dev`, `ffmpeg`, затем `shards install` + `crystal build --release`. Два варианта установки: системно (`/usr/local/bin/`) или в домашку (`~/.local/bin/`).
+
+**Debian-пакет**: `distrib/debian/create-deb.sh` собирает `.deb` c зависимостями `libexif12, ffmpeg, libpcre2-8-0`. Бинарник кладётся в `/usr/bin/ktlg2`. Версия и мейнтейнер настраиваются через переменные окружения.
+
+**bump-version**: `distrib/bump-version.sh` анализирует `git log` от последнего тега до HEAD по Conventional Commits: `feat` → minor, `fix`/прочее → patch, `!` → major. Правит `version` в `shard.yml` и печатает команды для коммита и тега.
+
+**README.md**: Создан с описанием команд и примерами использования.
+
+**Версия**: 0.1.0 → 0.1.3 (документационные и инфраструктурные коммиты).
