@@ -39,11 +39,13 @@ help:
 # --- Сборка ---
 
 bin/$(BIN): $(SRC) $(SHARD)
+	mkdir -p bin
 	crystal build $(SRC) --release -o bin/$(BIN)
 
 build: bin/$(BIN)
 
 bin/$(BIN).static: $(SRC) $(SHARD)
+	mkdir -p bin
 	crystal build $(SRC) --release --no-debug --static -o bin/$(BIN).static
 
 static: bin/$(BIN).static
