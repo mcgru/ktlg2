@@ -158,3 +158,14 @@ VERSION = {{ read_file("./shard.yml").split('\n').find(&.starts_with?("version: 
 ## 2026-05-21 — make install разделён на install-local и install-global
 
 `make install` теперь выводит подсказку с предложением запустить `make install-local` или `make install-global` и завершается с ошибкой. `install-global` ставит в `/usr/local/bin` через sudo, `install-local` — в `~/.local/bin` с проверкой PATH в `.bashrc`.
+
+## 2026-05-21 — spec для make install
+
+`spec/test_install.sh` — bash-тесты для `install`, `install-local`, `install-global`:
+- установка бинарника в нужную директорию
+- подсказка PATH, когда `.bashrc` не содержит `~/.local/bin`
+- отсутствие подсказки, когда PATH уже настроен
+- `make install` показывает инструкцию и завершается с ошибкой
+- `install-global` проверяется через dry-run
+
+Добавлен `make test-install`, включён в `make check`.

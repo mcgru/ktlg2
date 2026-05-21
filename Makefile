@@ -2,7 +2,7 @@ BIN    := ktlg2
 SRC    := src/main.cr
 SHARD  := shard.yml
 
-.PHONY: help build static docker test lint format fix check install install-local install-global clean
+.PHONY: help build static docker test lint format fix check test-install install install-local install-global clean
 
 help:
 	@echo "Usage: make <target>"
@@ -17,12 +17,13 @@ help:
 	@echo "  lint      ameba"
 	@echo "  format    проверка форматирования (crystal tool format --check)"
 	@echo "  fix       применить форматирование"
-	@echo "  check     test + lint + format"
+	@echo "  check     test + lint + format + test-install"
 	@echo
 	@echo "Установка:"
 	@echo "  install-global   установить в /usr/local/bin (через sudo)"
 	@echo "  install-local    установить в ~/.local/bin"
 	@echo "  install          подсказка, использовать install-local/install-global"
+	@echo "  test-install     spec для make install"
 	@echo
 	@echo "Прочее:"
 	@echo "  clean     удалить бинарники"
@@ -59,7 +60,10 @@ format:
 fix:
 	crystal tool format
 
-check: test lint format
+check: test lint format test-install
+
+test-install:
+	@bash spec/test_install.sh
 
 # --- Установка ---
 
