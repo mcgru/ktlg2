@@ -6,7 +6,7 @@
 
 ```bash
 # Crystal lang (официальный репозиторий)
-curl -fsSL https://packagecloud.io/install/repositories/crystal/install/script.deb.sh | sudo bash
+curl -fsSL https://crystal-lang.org/install.sh | sudo bash
 sudo apt-get install -y crystal
 
 # Системные библиотеки для ktlg2
