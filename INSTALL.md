@@ -2,7 +2,7 @@
 
 ## Зависимости
 
-**Debian 12 (голая система):**
+**Debian / Ubuntu (голая система):**
 
 ```bash
 # Crystal lang (официальный репозиторий)
@@ -15,42 +15,81 @@ sudo apt-get install -y libexif-dev ffmpeg git make
 
 `libexif-dev` нужен для чтения EXIF из JPEG. `ffmpeg` предоставляет `ffprobe` для извлечения даты из MP4/AVI/MOV.
 
-## Сборка
+---
+
+## Способы установки
+
+### 1. Сборка из исходников + ручная установка
 
 ```bash
-git clone <url-репозитория>
+git clone https://github.com/mcgru/ktlg2.git
 cd ktlg2
-
-# Установка зависимостей шардов
 shards install
-
-# Release-сборка
 mkdir -p bin
 crystal build src/main.cr --release -o bin/ktlg2
 
-# Создание deb-файла
-./distrib/debian/create-deb.sh
-
-# Способ установки:
-sudo dpkg -i ktlg2-VERSION.dev
-```
-
-## Установка
-
-**Системно (для всех пользователей):**
-
-```bash
+# Системно (для всех пользователей):
 sudo cp bin/ktlg2 /usr/local/bin/
-```
 
-**В домашнюю директорию (только для текущего пользователя):**
-
-```bash
+# Или в домашнюю директорию:
 mkdir -p ~/.local/bin
 cp bin/ktlg2 ~/.local/bin/
-# Добавьте ~/.local/bin в PATH, если ещё не добавлен:
-# echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
 ```
+
+### 2. Через Makefile
+
+```bash
+git clone https://github.com/mcgru/ktlg2.git
+cd ktlg2
+shards install
+
+# Глобально (через sudo):
+make install-global
+
+# Локально (для текущего пользователя):
+make install-local
+# Makefile сам добавит ~/.local/bin в PATH, если его нет в .bashrc
+```
+
+### 3. Через Docker
+
+```bash
+git clone https://github.com/mcgru/ktlg2.git
+cd ktlg2
+
+# Собрать образ:
+make docker
+# или: docker build -t ktlg2 .
+
+# Запуск (проброс папки с фото):
+docker run --rm -v /path/to/photos:/data ktlg2 /data
+docker run --rm -v /path/to/photos:/data ktlg2 rename /data
+```
+
+Статический бинарник внутри образа — не требует libexif/ffmpeg на хосте. Но `ffprobe` для видео не будет работать (нет ffmpeg внутри контейнера, если не установлен на хосте и не примонтирован).
+
+### 4. Deb-пакет
+
+```bash
+git clone https://github.com/mcgru/ktlg2.git
+cd ktlg2
+shards install
+
+# Собрать .deb:
+./distrib/debian/create-deb.sh
+
+# Установить:
+sudo dpkg -i ktlg2_*.deb
+
+# Если dpkg жалуется на зависимости:
+sudo apt-get install -f
+```
+
+Пакет устанавливает бинарник в `/usr/bin/ktlg2` и содержит зависимости `libexif12`, `ffmpeg`, `libpcre2-8-0`.
+
+---
 
 ## Проверка
 
@@ -63,4 +102,7 @@ ktlg2 --version
 
 ```bash
 crystal spec
+make test        # то же самое
+make check       # тесты + линтер + форматирование
+make test-install  # тесты make install
 ```

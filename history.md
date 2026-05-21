@@ -169,3 +169,11 @@ VERSION = {{ read_file("./shard.yml").split('\n').find(&.starts_with?("version: 
 - `install-global` проверяется через dry-run
 
 Добавлен `make test-install`, включён в `make check`.
+
+## 2026-05-21 — INSTALL.md переписан
+
+Обновлён `INSTALL.md` — задокументированы все 4 способа установки на чистый Debian/Ubuntu:
+1. ручная сборка (`crystal build`) + копирование бинарника
+2. `make install-local` / `make install-global`
+3. Docker (`make docker`, `docker run -v`)
+4. deb-пакет (`create-deb.sh` + `dpkg -i`)
