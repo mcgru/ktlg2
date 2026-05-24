@@ -203,3 +203,10 @@ VERSION = {{ read_file("./shard.yml").split('\n').find(&.starts_with?("version: 
 ## 2026-05-21 — libgc-dev добавлен в зависимости
 
 `libgc-dev` (Boehm GC, нужен для линковки Crystal) добавлен в `DEPS_PKG`, `deps-check`, `deps-install` и `INSTALL.md`.
+
+## 2026-05-24 — Makefile: deb-цель
+
+**Что**: Добавлена make-цель `deb`, которая вызывает `distrib/debian/create-deb.sh`.
+Цель добавлена в `.PHONY` и справку `make help`.
+
+**Зачем**: Чтобы сборка .deb-пакета была на одном уровне с `make docker` — не нужно помнить путь к скрипту.
