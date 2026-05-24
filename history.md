@@ -244,3 +244,7 @@ VERSION = {{ read_file("./shard.yml").split('\n').find(&.starts_with?("version: 
 - `src/ktlg2/extractor.cr` — null-safe `extract_exif` через `LibExif`
 - `Makefile` — цель `tests`
 - `distrib/test-my-case.sh` — новый скрипт
+
+## 2026-05-24 — .gitignore: tests/
+
+**Что**: `tests/` добавлен в `.gitignore` — директория с тестовыми данными не должна попадать в репозиторий.

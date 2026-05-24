@@ -5,3 +5,4 @@ old.bash/
 bin/
 docs/
 *.deb
+tests/
