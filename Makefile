@@ -2,7 +2,7 @@ BIN    := ktlg2
 SRC    := src/main.cr
 SHARD  := shard.yml
 
-.PHONY: help build static docker deb test lint format fix check test-install deps-check deps-install bump install install-local install-global clean
+.PHONY: help build static docker deb deb-static test lint format fix check test-install deps-check deps-install bump install install-local install-global clean
 
 help:
 	@echo "Usage: make <target>"
@@ -12,6 +12,7 @@ help:
 	@echo "  static    статический бинарник bin/$(BIN).static"
 	@echo "  docker    собрать Docker-образ"
 	@echo "  deb       собрать .deb-пакет"
+	@echo "  deb-static собрать .deb-пакет со статическим бинарником"
 	@echo
 	@echo "Тесты и качество:"
 	@echo "  test      crystal spec"
@@ -58,8 +59,11 @@ docker:
 
 # --- Deb-пакет ---
 
-deb:
+deb: bin/$(BIN)
 	@bash distrib/debian/create-deb.sh
+
+deb-static: bin/$(BIN).static
+	BINARY=bin/$(BIN).static PKG_SUFFIX=static bash distrib/debian/create-deb.sh
 
 # --- Тесты и качество ---
 

@@ -208,5 +208,17 @@ VERSION = {{ read_file("./shard.yml").split('\n').find(&.starts_with?("version: 
 
 **Что**: Добавлена make-цель `deb`, которая вызывает `distrib/debian/create-deb.sh`.
 Цель добавлена в `.PHONY` и справку `make help`.
+`deb` зависит от `bin/ktlg2` — при изменении исходников make сначала пересобирает бинарник.
+Скрипт `create-deb.sh` больше не запускает `crystal build`, только проверяет наличие бинарника.
 
 **Зачем**: Чтобы сборка .deb-пакета была на одном уровне с `make docker` — не нужно помнить путь к скрипту.
+
+## 2026-05-24 — deb-static
+
+**Что**: Добавлена `make deb-static` — собирает .deb со статическим бинарником (`bin/ktlg2.static`).
+Бинарник внутри .deb называется `ktlg2`, имя файла — `ktlg2_*_static_amd64.deb`.
+Зависимости для static-deb: только `ffmpeg` (libexif и pcre2 статически слинкованы).
+
+**Изменения**:
+- `Makefile`: цель `deb-static` с зависимостью от `bin/ktlg2.static`
+- `create-deb.sh`: параметры `BINARY` и `PKG_SUFFIX`, автовыбор `DEPS`

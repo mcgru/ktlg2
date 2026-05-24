@@ -14,11 +14,22 @@ DESCRIPTION="Media file cataloging utility
  Organize, rename, touch, check and deduplicate media files
  (JPEG, PNG, MP4, AVI, MOV)."
 
-DEPS="libexif12, ffmpeg, libpcre2-8-0"
+# Source binary path (override for static build, e.g. BINARY=bin/ktlg2.static)
+BINARY="${BINARY:-bin/$PACKAGE}"
+# Package name suffix in filename (e.g. PKG_SUFFIX=-static -> ktlg2_0.4.0_static_amd64.deb)
+PKG_SUFFIX="${PKG_SUFFIX:-}"
 
-# --- build release binary ---
-echo "==> Building release binary..."
-crystal build src/main.cr --release -o "bin/$PACKAGE"
+DEPS_regular="libexif12, ffmpeg, libpcre2-8-0"
+DEPS_static="ffmpeg"
+# Автовыбор зависимостей: при статической сборке libexif и pcre2 не нужны
+DEPS_VAR="DEPS_${PKG_SUFFIX:-regular}"
+DEPS="${!DEPS_VAR}"
+
+# --- check binary exists (built by make deb dependency) ---
+if [[ ! -f "$BINARY" ]]; then
+  echo "ERROR: $BINARY not found. Run 'make build' first." >&2
+  exit 1
+fi
 
 # --- prepare package tree ---
 PKG_ROOT="$(mktemp -d)"
@@ -28,7 +39,7 @@ BINDIR="$PKG_ROOT/usr/bin"
 DEBIANDIR="$PKG_ROOT/DEBIAN"
 mkdir -p "$BINDIR" "$DEBIANDIR"
 
-install -m 0755 "bin/$PACKAGE" "$BINDIR/$PACKAGE"
+install -m 0755 "$BINARY" "$BINDIR/$PACKAGE"
 
 # --- control file ---
 cat > "$DEBIANDIR/control" <<EOF
@@ -43,7 +54,7 @@ Description: $DESCRIPTION
 EOF
 
 # --- build .deb ---
-DEB_FILE="${PACKAGE}_${VERSION}_${ARCH}.deb"
+DEB_FILE="${PACKAGE}_${VERSION}${PKG_SUFFIX:+_${PKG_SUFFIX}}_${ARCH}.deb"
 echo "==> Building $DEB_FILE ..."
 dpkg-deb --build "$PKG_ROOT" "$DEB_FILE"
 
