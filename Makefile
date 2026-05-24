@@ -2,7 +2,7 @@ BIN    := ktlg2
 SRC    := src/main.cr
 SHARD  := shard.yml
 
-.PHONY: help build static docker deb deb-static test lint format fix check test-install deps-check deps-install bump install install-local install-global clean
+.PHONY: help build static docker deb deb-static tests test lint format fix check test-install deps-check deps-install bump install install-local install-global clean
 
 help:
 	@echo "Usage: make <target>"
@@ -16,6 +16,7 @@ help:
 	@echo
 	@echo "Тесты и качество:"
 	@echo "  test      crystal spec"
+	@echo "  tests     прогнать все 6 команд ktlg2 на тестовых данных"
 	@echo "  lint      ameba"
 	@echo "  format    проверка форматирования (crystal tool format --check)"
 	@echo "  fix       применить форматирование"
@@ -69,6 +70,15 @@ deb-static: bin/$(BIN).static
 
 test:
 	crystal spec
+
+tests: bin/$(BIN)
+	@bash distrib/test-my-case.sh organize && \
+	  bash distrib/test-my-case.sh rename && \
+	  bash distrib/test-my-case.sh touch && \
+	  bash distrib/test-my-case.sh plane && \
+	  bash distrib/test-my-case.sh check && \
+	  bash distrib/test-my-case.sh dups && \
+	  echo "" && echo "All tests passed."
 
 lint:
 	bin/ameba

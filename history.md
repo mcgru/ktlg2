@@ -222,3 +222,25 @@ VERSION = {{ read_file("./shard.yml").split('\n').find(&.starts_with?("version: 
 **Изменения**:
 - `Makefile`: цель `deb-static` с зависимостью от `bin/ktlg2.static`
 - `create-deb.sh`: параметры `BINARY` и `PKG_SUFFIX`, автовыбор `DEPS`
+
+## 2026-05-24 — EXIF SIGSEGV fix + test-my-case.sh
+
+**Проблема**: `extract_exif` падал с signal 11 на JPEG без EXIF или с повреждёнными метаданными.
+Корень: `Exif.new(path)` в crystal-exif не проверяет `null` от `libexif` (`exif_data_new_from_file`),
+и разыменование нулевого указателя в `initialize` роняет процесс — `rescue` сигналы не ловит.
+
+**Решение**: Переписан `extract_exif` на прямые вызовы `LibExif` с null-чеками на каждом уровне:
+- `exif_data_new_from_file` → `nil` если null
+- IFD-контент (`ifd[ifd.value]`) → `nil` если null
+- `exif_content_get_entry` → `nil` если null
+- `exif_entry_get_value` → `nil` если null
+- Освобождение: только `exif_data_free` (без лишнего `unref`)
+
+**test-my-case.sh**: Добавлен скрипт `distrib/test-my-case.sh`, который копирует `tests/data/` →
+`tests/target/` и прогоняет указанную команду ktlg2. Цель `make tests` прогоняет все 6 команд
+последовательно. Все проходят (6/6 OK).
+
+**Изменённые файлы**:
+- `src/ktlg2/extractor.cr` — null-safe `extract_exif` через `LibExif`
+- `Makefile` — цель `tests`
+- `distrib/test-my-case.sh` — новый скрипт

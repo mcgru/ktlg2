@@ -51,23 +51,52 @@ module Ktlg2
       ext = File.extname(path).downcase.lstrip('.')
       return nil unless ext.in?(IMAGE_EXTS)
 
-      exif = Exif.new(path)
-      raw = exif.date_time_original
-      raw ||= exif.date_time_digitized
-      raw ||= exif.date_time
+      data_ptr = LibExif.exif_data_new_from_file(path)
+      return nil unless data_ptr
 
-      return nil unless raw
+      begin
+        raw = lookup_exif_tag(data_ptr, LibExif::ExifTag::ExifTagDateTimeOriginal)
+        raw ||= lookup_exif_tag(data_ptr, LibExif::ExifTag::ExifTagDateTimeDigitized)
+        raw ||= lookup_exif_tag(data_ptr, LibExif::ExifTag::ExifTagDateTime)
 
-      # bash: исключаем 00:00:00 и 000000
-      return nil if raw.includes?("00:00:00") || raw.includes?("000000")
+        return nil unless raw
 
-      # EXIF формат: "YYYY:MM:DD HH:MM:SS"
-      time = Time.parse(raw, "%Y:%m:%d %H:%M:%S", Time::Location::UTC)
-      epoch = time.to_unix
-      return nil unless valid_timestamp?(epoch)
+        # bash: исключаем 00:00:00 и 000000
+        return nil if raw.includes?("00:00:00") || raw.includes?("000000")
 
-      FileTimestamp.new(epoch, TimestampSource::Exif)
-    rescue
+        # EXIF формат: "YYYY:MM:DD HH:MM:SS"
+        time = Time.parse(raw, "%Y:%m:%d %H:%M:%S", Time::Location::UTC)
+        epoch = time.to_unix
+        return nil unless valid_timestamp?(epoch)
+
+        FileTimestamp.new(epoch, TimestampSource::Exif)
+      ensure
+        LibExif.exif_data_free(data_ptr)
+      end
+    end
+
+    # Поиск значения EXIF-тега в IFD-цепочке с проверкой на null.
+    private def lookup_exif_tag(
+      data_ptr : Pointer(LibExif::ExifData),
+      tag : LibExif::ExifTag,
+    ) : String?
+      ifds = LibExif::ExifIfd.values.reject(LibExif::ExifIfd::ExifIfdCount)
+
+      ifds.each do |ifd|
+        content_ptr = data_ptr.value.ifd[ifd.value]
+        next unless content_ptr
+
+        entry_ptr = LibExif.exif_content_get_entry(content_ptr, tag)
+        next unless entry_ptr
+
+        buffer = Bytes.new(1024)
+        value_ptr = LibExif.exif_entry_get_value(entry_ptr, buffer.to_unsafe.as(LibC::Char*), 1024)
+        next unless value_ptr
+
+        val = String.new(value_ptr).strip
+        return val unless val.empty?
+      end
+
       nil
     end
 
